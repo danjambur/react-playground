@@ -52,7 +52,7 @@ function InfiniteLoader<T>({
       try {
         const res = await fetch(`${apiEndpoint}?page=${page}&limit=${limit}`);
         const data = await res.json();
-        setData((prevData) => [...prevData, ...data.data]);
+        setData((prevData) => [...prevData, ...data]);
         setPage((prevPage) => prevPage + 1);
       } catch (err) {
         console.log("Error fetching data", err);
