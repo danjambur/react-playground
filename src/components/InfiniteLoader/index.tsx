@@ -16,16 +16,24 @@ function InfiniteLoader<T>({
   const [page, setPage] = React.useState<number>(1);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`${apiEndpoint}?page=${page}&limit=${limit}`)
-      .then((res) => res.json())
-      .then((res) => {
-        setData((prevData) => [...prevData, ...res.data]);
+    fetchMoreData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchMoreData = async () => {
+    if (!isLoading) {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`${apiEndpoint}?page=${page}&limit=${limit}`);
+        const data = await res.json();
+        setData((prevData) => [...prevData, ...data.data]);
         setPage((prevPage) => prevPage + 1);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsLoading(false));
-  }, [apiEndpoint, page, limit]);
+      } catch (err) {
+        console.log("Error fetching data", err);
+      }
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div>
