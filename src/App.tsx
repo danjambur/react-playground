@@ -16,12 +16,13 @@ function App() {
                     className="flex flex-col items-center justify-center"
                   >
                     <img
-                      src={`${item.download_url}?grayscale`}
+                      src={`${item.download_url}`}
                       alt={item.author}
                       className="w-full h-full object-cover rounded-md"
                     />
                     <div className="text-center">
                       <p className="text-lg font-semibold">{item.author}</p>
+                      <p className="text-sm">{item.title}</p>
                       <p className="text-sm">
                         {item.width} x {item.height}
                       </p>
