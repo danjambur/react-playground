@@ -1,0 +1,8 @@
+{
+  "include": ["src", "jest.config.js"],
+  "compilerOptions": {
+    "baseUrl": "src",
+    "jsx": "react",
+    "esModuleInterop": true
+  }
+}
