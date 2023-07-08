@@ -1,75 +1,31 @@
-import React, { useState } from 'react';
-import './App.css';
-
-function Todo({ todo, index, completeTodo, removeTodo }) {
-  console.log(todo);
-  return (
-    <div style={{ textDecoration: todo.isChecked ? 'line-through' : '' }} className="todo">
-      {todo.text}
-      <button onClick={() => completeTodo(index)}>Complete</button>
-      <button onClick={() => removeTodo(index)}>x</button>
-    </div>
-  );
-}
-
-function TodoForm({ addTodo }) {
-  const [ value, setValue ] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!value) return;
-    addTodo(value);
-    setValue('');
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" className="input" value={value} onChange={(e) => setValue(e.target.value)} />
-    </form>
-  );
-}
+import React from 'react';
 
 function App() {
-  const [ todos, setTodos ] = useState([
-    {
-      text: 'Learn about react',
-      isChecked: false
-    },
-    {
-      text: 'Learn about more react',
-      isChecked: false
-    },
-    {
-      text: 'Learn about react',
-      isChecked: false
-    }
-  ]);
-  console.log('Todos', todos);
-
-  const addTodo = (text) => {
-    const newTodos = [ ...todos, { text } ];
-    setTodos(newTodos);
-  };
-
-  const completeTodo = (index) => {
-    const newTodos = [ ...todos ];
-    newTodos[index].isChecked = true;
-    setTodos(newTodos);
-  };
-
-  const removeTodo = (index) => {
-    const newTodos = [ ...todos ];
-    newTodos.splice(index, 1);
-    setTodos(newTodos);
-  };
-
   return (
-    <div className="app">
-      <div className="todo-list">
-        {todos.map((todo, index) => (
-          <Todo key={index} index={index} todo={todo} completeTodo={completeTodo} removeTodo={removeTodo} />
-        ))}
-        <TodoForm addTodo={addTodo} />
+    <div className="flex flex-col h-full items-center justify-center bg-gray-200 text-gray-700">
+      <div className="flex items-center">
+        <h1 className="text-6xl font-thin tracking-wider">Create React App + Tailwind CSS</h1>
+      </div>
+      <p className="my-6 tracking-wide">
+        Edit <code>src/App.js</code> and save to reload.
+      </p>
+      <div className="mt-6 flex justify-center">
+        <a
+          className="uppercase hover:underline"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+        <a
+          className="ml-10 uppercase hover:underline"
+          href="https://tailwindcss.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn Tailwind
+        </a>
       </div>
     </div>
   );
