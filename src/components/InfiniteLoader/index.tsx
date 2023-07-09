@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { useInfiniteQuery } from "react-query";
 import { useInView } from "react-intersection-observer";
 
@@ -39,10 +39,10 @@ function InfiniteLoader<T>({
   };
 
   useEffect(() => {
-    if (inView && hasNextPage) {
+    if (inView) {
       fetchNextPage();
     }
-  }, [inView]);
+  }, [inView, fetchNextPage, hasNextPage]);
 
   return (
     <>
