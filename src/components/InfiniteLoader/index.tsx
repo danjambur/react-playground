@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
+import { useInfiniteQuery } from "react-query";
 
 interface InfiniteLoaderProps<T> {
   apiEndpoint: string; // any api endpoint
@@ -11,60 +12,50 @@ function InfiniteLoader<T>({
   limit,
   renderContent,
 }: InfiniteLoaderProps<T>) {
-  const [data, setData] = useState<T[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(1);
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const loaderRef = useRef(null);
+  const [pageParam, setPageParam] = React.useState(1);
 
-  useEffect(() => {
-    fetchMoreData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    // scrolling observer
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      threshold: 0,
+  const { data, isLoading, isError, fetchNextPage, hasNextPage } =
+    useInfiniteQuery("data", () => fetchMoreData(), {
+      getNextPageParam: (_lastPage, allPages) => {
+        const nextPage = allPages.length + 1;
+        return nextPage;
+      },
     });
 
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-    // don't forget to clean up!
-    return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
-      }
-    };
-  }, []);
-
-  const handleObserver: IntersectionObserverCallback = (items) => {
-    const target = items[0];
-    if (target.isIntersecting) {
-      fetchMoreData();
-    }
-  };
-
   const fetchMoreData = async () => {
-    if (!isLoading) {
-      setIsLoading(true);
-      try {
-        const res = await fetch(`${apiEndpoint}?page=${page}&limit=${limit}`);
-        const data = await res.json();
-        setData((prevData) => [...prevData, ...data]);
-      } catch (err) {
-        console.log("Error fetching data", err);
-      }
-      setPage((prevPage) => prevPage + 1);
-      setIsLoading(false);
-    }
+    const res = await fetch(`${apiEndpoint}?page=${pageParam}&limit=${limit}`);
+    const data = await res.json();
+    setPageParam((prev) => prev + 1);
+    return data;
   };
+
+  const handleObserver = useCallback(
+    (entries: [any]) => {
+      const [target] = entries;
+      if (target.isIntersecting) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage]
+  );
+
+  useEffect(() => {
+    const element = loaderRef.current;
+    const option = { threshold: 0 };
+
+    const observer = new IntersectionObserver(handleObserver, option);
+    observer.observe(element);
+    return () => observer.unobserve(element);
+  }, [fetchNextPage, hasNextPage, handleObserver]);
 
   return (
     <div>
-      {renderContent(data)}
+      {data?.pages.map((page, i) => (
+        <React.Fragment key={i}>{renderContent(page)}</React.Fragment>
+      ))}
       {isLoading && <div>Loading...</div>}
+      {isError && <div>Error fetching data</div>}
       <div ref={loaderRef} className="h-px opacity-0 pointer-events-none" />
     </div>
   );
