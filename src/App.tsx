@@ -6,7 +6,7 @@ function App() {
       <div className="flex items-center">
         <InfiniteLoader
           apiEndpoint="https://picsum.photos/v2/list?random=1"
-          limit={20}
+          limit={50}
           renderContent={(data: any) => {
             return (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 m-4">

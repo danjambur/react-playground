@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface InfiniteLoaderProps<T> {
   apiEndpoint: string; // any api endpoint
@@ -11,9 +11,9 @@ function InfiniteLoader<T>({
   limit,
   renderContent,
 }: InfiniteLoaderProps<T>) {
-  const [data, setData] = React.useState<T[]>([]);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [page, setPage] = React.useState<number>(1);
+  const [data, setData] = useState<T[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function InfiniteLoader<T>({
     // scrolling observer
     const observer = new IntersectionObserver(handleObserver, {
       root: null,
-      threshold: 1,
+      threshold: 0,
     });
 
     if (loaderRef.current) {
@@ -53,10 +53,10 @@ function InfiniteLoader<T>({
         const res = await fetch(`${apiEndpoint}?page=${page}&limit=${limit}`);
         const data = await res.json();
         setData((prevData) => [...prevData, ...data]);
-        setPage((prevPage) => prevPage + 1);
       } catch (err) {
         console.log("Error fetching data", err);
       }
+      setPage((prevPage) => prevPage + 1);
       setIsLoading(false);
     }
   };
@@ -65,7 +65,7 @@ function InfiniteLoader<T>({
     <div>
       {renderContent(data)}
       {isLoading && <div>Loading...</div>}
-      <div ref={loaderRef} />
+      <div ref={loaderRef} className="h-px opacity-0 pointer-events-none" />
     </div>
   );
 }
